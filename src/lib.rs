@@ -6,7 +6,7 @@
 
 #![no_std]
 
-extern crate bump_allocator as allocator;
+extern crate hole_list_allocator as allocator;
 #[macro_use]
 extern crate alloc;
 
@@ -52,6 +52,10 @@ pub extern "C" fn rust_main(multiboot_information_address: usize) {
     vec_test[3] = 42;
     for i in &vec_test {
         print!("{} ", i);
+    }
+
+    for i in 0..10000 {
+        format!("Some String");
     }
 
     println!("It did not crash!");
