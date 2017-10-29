@@ -1,5 +1,5 @@
 pub use self::mapper::Mapper;
-use core::ops::{Deref, DerefMut};
+use core::ops::{Deref, DerefMut, Add};
 
 use self::temporary_page::TemporaryPage;
 
@@ -33,7 +33,7 @@ impl Page {
         Page { number: address / PAGE_SIZE }
     }
 
-    fn start_address(&self) -> usize {
+    pub fn start_address(&self) -> usize {
         self.number * PAGE_SIZE
     }
 
@@ -61,6 +61,15 @@ impl Page {
     }
 }
 
+impl Add<usize> for Page {
+    type Output = Page;
+
+    fn add(self, rhs: usize) -> Page {
+        Page { number: self.number + rhs }
+    }
+}
+
+#[derive(Clone)]
 pub struct PageIter {
     start: Page,
     end: Page,

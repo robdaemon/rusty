@@ -17,30 +17,29 @@ assembly_object_files := $(patsubst src/arch/$(arch)/%.asm, \
 all: $(kernel)
 
 clean:
-	@cargo clean
-	@rm -rf build
+	cargo clean
+	rm -rf build
 
 run: $(iso)
-	@qemu-system-x86_64 -cdrom $(iso)
+	qemu-system-x86_64 -cdrom $(iso) $(QEMU_ARGS)
 
 iso: $(iso)
 
 $(iso): $(kernel) $(grub_cfg)
-	@mkdir -p build/isofiles/boot/grub
-	@cp $(kernel) build/isofiles/boot/kernel.bin
-	@cp $(grub_cfg) build/isofiles/boot/grub
+	mkdir -p build/isofiles/boot/grub
+	cp $(kernel) build/isofiles/boot/kernel.bin
+	cp $(grub_cfg) build/isofiles/boot/grub
 	grub-mkrescue -o $(iso) build/isofiles 
-	# 2> /dev/null
-	@rm -r build/isofiles
+	rm -r build/isofiles
 
 $(kernel): kernel $(rust_os) $(assembly_object_files) $(linker_script)
-	@$(arch)-elf-ld -n --gc-sections -T $(linker_script) -o $(kernel) \
+	$(arch)-elf-ld -n --gc-sections -T $(linker_script) -o $(kernel) \
 		$(assembly_object_files) $(rust_os)
 
 kernel:
-	@xargo build --target $(target)
+	xargo build --target $(target)
 
 # compile assembly files
 build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	mkdir -p $(shell dirname $@)
-	/opt/nasm-2.12/nasm -felf64 $< -o $@
+	nasm -felf64 $< -o $@
